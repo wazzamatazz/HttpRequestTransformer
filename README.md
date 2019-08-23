@@ -2,8 +2,11 @@
 
 Contains an `HttpMessageHandler` ([HttpRequestTransformHandler](./src/HttpRequestTransformer/HttpRequestTransformHandler.cs)) that can be used to modify outgoing HTTP requests prior to sending. An example use case includes a backchannel HTTP client in a server-side app where you need to attach the authorization token for the calling user to the request.
 
-
 # Getting Started
+
+Add the `Jaahas.HttpRequestTransformer` NuGet package to your project.
+
+# Example
 
 In this example, we'll attach a bearer token to outgoing requests made by a backchannel client in an ASP.NET Core application. First, add an [HttpRequestTransformHandler](./src/HttpRequestTransformer/HttpRequestTransformHandler.cs) to the request pipeline for your `HttpClient`:
 
@@ -13,7 +16,7 @@ public void ConfigureServices(IServiceCollection services) {
         .AddHttpClient("Test", options => {
             options.BaseAddress = new Uri("https://some-remote-site.com");
         })
-        .AddHttpMessageHandler(() => new HttpRequestTransformHandler(AddBearerTokenToRequest));
+        .AddHttpMessageHandler(() => new Jaahas.Http.HttpRequestTransformHandler(AddBearerTokenToRequest));
 }
 ```
 
@@ -35,8 +38,6 @@ private static async Task AddBearerTokenToRequest(HttpRequestMessage request, Ca
 Finally, in your code that will use the client, add a `ClaimsPrincipal` to the outgoing request's properties prior to sending:
 
 ```csharp
-using Jaahas.Http;
-
 [ApiController]
 [Authorize]
 public class MyController : ControllerBase {

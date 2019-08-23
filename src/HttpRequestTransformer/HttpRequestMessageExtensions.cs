@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Net.Http;
 
-namespace Jaahas.Http {
+namespace System.Net.Http {
 
     /// <summary>
     /// Extensions for <see cref="HttpRequestMessage"/>.
@@ -12,7 +11,7 @@ namespace Jaahas.Http {
         /// The key to use for the request state object in the <see cref="HttpRequestMessage.Properties"/>
         /// dictionary.
         /// </summary>
-        public static readonly string StatePropertyName = typeof(HttpRequestTransformHandler).FullName + ".State";
+        public static readonly string StatePropertyName = typeof(Jaahas.Http.HttpRequestTransformHandler).FullName + ".State";
 
 
         /// <summary>

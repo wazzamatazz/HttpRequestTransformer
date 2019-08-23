@@ -6,7 +6,6 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using Jaahas.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -22,7 +21,7 @@ namespace AddAccessTokenExample {
                 .AddHttpClient("Test", options => {
                     options.BaseAddress = new Uri("https://some-remote-site.com");
                 })
-                .AddHttpMessageHandler(() => new HttpRequestTransformHandler(AddBearerTokenToRequest));
+                .AddHttpMessageHandler(() => new Jaahas.Http.HttpRequestTransformHandler(AddBearerTokenToRequest));
         }
 
         
