@@ -2,8 +2,9 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
-    <PackageId>Jaahas.HttpRequestTransformer</PackageId>
     <RootNamespace>Jaahas.Http</RootNamespace>
+    <PackageId>Jaahas.HttpRequestTransformer</PackageId>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
