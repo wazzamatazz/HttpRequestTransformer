@@ -4,7 +4,7 @@ Contains an `HttpMessageHandler` ([HttpRequestTransformHandler](./src/HttpReques
 
 # Getting Started
 
-Add the `Jaahas.HttpRequestTransformer` NuGet package to your project.
+Add the `Jaahas.HttpRequestTransformer` [NuGet package](https://www.nuget.org/packages/Jaahas.HttpRequestTransformer) to your project.
 
 # Example
 
