@@ -127,7 +127,11 @@ public void ConfigureServices(IServiceCollection services) {
 }
 
 
-private static async Task LogResponseDetailsWithTiming(HttpRequestMessage request, HttpMessageHandlerDelegate next, CancellationToken cancellationToken) {
+private static async Task LogResponseDetailsWithTiming(
+    HttpRequestMessage request, 
+    HttpMessageHandlerDelegate next, 
+    CancellationToken cancellationToken
+) {
     // Start the stopwatch.
     var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
