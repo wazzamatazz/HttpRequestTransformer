@@ -1,6 +1,6 @@
 # HttpRequestTransformer
 
-Contains an `DelegatingHandler` ([HttpRequestPipelineHandler](./src/HttpRequestTransformer/HttpRequestPipelineHandler.cs)) that can be used to inspect or modify outgoing HTTP requests prior to sending, and/or to inspect or modify received HTTP response messages. An example use case includes a backchannel HTTP client in a server-side app where you need to attach the authorization token for the calling user to an outgoing request.
+Contains a `DelegatingHandler` implementation ([HttpRequestPipelineHandler](./src/HttpRequestTransformer/HttpRequestPipelineHandler.cs)) that can be used to inspect or modify outgoing HTTP requests prior to sending, and/or to inspect or modify received HTTP response messages. An example use case includes a backchannel HTTP client in a server-side app where you need to attach the authorization token for the calling user to an outgoing request.
 
 
 # Getting Started
