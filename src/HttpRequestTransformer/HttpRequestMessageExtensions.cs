@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace System.Net.Http {
+﻿namespace System.Net.Http {
 
     /// <summary>
     /// Extensions for <see cref="HttpRequestMessage"/>.
@@ -68,7 +66,7 @@ namespace System.Net.Http {
             }
 
             if (!request.Properties.TryGetValue(StatePropertyName, out var o) || !(o is T value)) {
-                return default(T);
+                return default!;
             }
 
             return value;

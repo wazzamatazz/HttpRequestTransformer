@@ -14,41 +14,83 @@ namespace Jaahas.Http {
     public class HttpRequestTransformHandler : DelegatingHandler {
 
         /// <summary>
-        /// The callback to invoke prior to sending the request.
+        /// The callback to invoke prior to sending a request.
         /// </summary>
-        private readonly HttpRequestTransformDelegate _callback;
+        private readonly HttpRequestTransformDelegate? _requestCallback;
+
+        /// <summary>
+        /// The callback to invoke after receiving a request.
+        /// </summary>
+        private readonly HttpResponseTransformDelegate? _responseCallback;
 
 
         /// <summary>
         /// Creates a new <see cref="HttpRequestTransformHandler"/> object.
         /// </summary>
-        /// <param name="callback">
-        ///   The callback to invoke prior to every request.
+        /// <param name="requestCallback">
+        ///   The callback to invoke prior to sending a request.
+        /// </param>
+        /// <param name="responseCallback">
+        ///   The callback to invoke after receiving a response.
         /// </param>
         /// <exception cref="ArgumentNullException">
-        ///   <paramref name="callback"/> is <see langword="null"/>.
+        ///   <paramref name="requestCallback"/> is <see langword="null"/>.
         /// </exception>
-        public HttpRequestTransformHandler(HttpRequestTransformDelegate callback) {
-            _callback = callback ?? throw new ArgumentNullException(nameof(callback));
+        /// <exception cref="ArgumentNullException">
+        ///   <paramref name="responseCallback"/> is <see langword="null"/>.
+        /// </exception>
+        public HttpRequestTransformHandler(
+            HttpRequestTransformDelegate requestCallback,
+            HttpResponseTransformDelegate responseCallback
+        ) {
+            _requestCallback = requestCallback ?? throw new ArgumentNullException(nameof(requestCallback));
+            _responseCallback = responseCallback ?? throw new ArgumentNullException(nameof(responseCallback));
         }
 
 
         /// <summary>
-        /// Passes an outgoing request to the registered callback and then passes the request on 
-        /// to an inner handler.
+        /// Creates a new <see cref="HttpRequestTransformHandler"/> object.
         /// </summary>
-        /// <param name="request">
-        ///   The outgoing request.
+        /// <param name="requestCallback">
+        ///   The callback to invoke prior to sending a request.
         /// </param>
-        /// <param name="cancellationToken">
-        ///   The cancellation token for the operation.
+        /// <exception cref="ArgumentNullException">
+        ///   <paramref name="requestCallback"/> is <see langword="null"/>.
+        /// </exception>
+        public HttpRequestTransformHandler(HttpRequestTransformDelegate requestCallback) {
+            _requestCallback = requestCallback ?? throw new ArgumentNullException(nameof(requestCallback));
+        }
+
+
+        /// <summary>
+        /// Creates a new <see cref="HttpRequestTransformHandler"/> object.
+        /// </summary>
+        /// <param name="requestCallback">
+        ///   The callback to invoke prior to sending a request.
         /// </param>
-        /// <returns>
-        ///   The response message.
-        /// </returns>
+        /// <param name="responseCallback">
+        ///   The callback to invoke after receiving a response.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        ///   <paramref name="responseCallback"/> is <see langword="null"/>.
+        /// </exception>
+        public HttpRequestTransformHandler(HttpResponseTransformDelegate responseCallback) {
+            _responseCallback = responseCallback ?? throw new ArgumentNullException(nameof(responseCallback));
+        }
+
+
+        /// <inheritdoc/>
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken) {
-            await _callback.Invoke(request, cancellationToken).ConfigureAwait(false);
-            return await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
+            if (_requestCallback != null) {
+                await _requestCallback.Invoke(request, cancellationToken).ConfigureAwait(false);
+            }
+            
+            var response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
+            if (_responseCallback != null) {
+                await _responseCallback.Invoke(response, cancellationToken).ConfigureAwait(false);
+            }
+
+            return response;
         }
 
     }

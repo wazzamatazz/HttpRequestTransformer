@@ -8,13 +8,13 @@
 
   <PropertyGroup>
     <Authors>Graham Watts</Authors>
-    <Description>Delegating handler that can be used to transform an HttpRequestMessage prior to sending.</Description>
+    <Description>Delegating handler that can be used to inspect or transform HttpRequestMessage and HttpResponseMessage instances in an HttpClient pipeline.</Description>
     <CopyrightStartYear>2019</CopyrightStartYear>
     <PackageProjectUrl>https://github.com/wazzamatazz/HttpRequestTransformer</PackageProjectUrl>
     <PackageOutputPath>$(MSBuildThisFileDirectory)artifacts</PackageOutputPath>
-    <Version>1.0.1.0</Version>
-    <AssemblyVersion>1.0.1.0</AssemblyVersion>
-    <AssemblyFileVersion>1.0.1.0</AssemblyFileVersion>
+    <Version>1.1.0</Version>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <AssemblyFileVersion>1.1.0.0</AssemblyFileVersion>
   </PropertyGroup>
 
   <!-- Set the copyright notice based on the current year at build time. -->

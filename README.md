@@ -1,6 +1,6 @@
 # HttpRequestTransformer
 
-Contains an `HttpMessageHandler` ([HttpRequestTransformHandler](./src/HttpRequestTransformer/HttpRequestTransformHandler.cs)) that can be used to modify outgoing HTTP requests prior to sending. An example use case includes a backchannel HTTP client in a server-side app where you need to attach the authorization token for the calling user to the request.
+Contains an `HttpMessageHandler` ([HttpRequestTransformHandler](./src/HttpRequestTransformer/HttpRequestTransformHandler.cs)) that can be used to inspect or modify outgoing HTTP requests prior to sending, or to inspect or modify received HTTP response messages. An example use case includes a backchannel HTTP client in a server-side app where you need to attach the authorization token for the calling user to the request.
 
 # Getting Started
 

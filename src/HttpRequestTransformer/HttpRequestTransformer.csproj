@@ -6,6 +6,8 @@
     <RootNamespace>Jaahas.Http</RootNamespace>
     <PackageId>Jaahas.HttpRequestTransformer</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <LangVersion>8.0</LangVersion>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
