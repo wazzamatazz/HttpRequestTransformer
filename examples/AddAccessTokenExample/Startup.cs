@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace AddAccessTokenExample {
     public class Startup {
@@ -18,14 +19,12 @@ namespace AddAccessTokenExample {
             // Register our HTTP client and add a request transformer that will add an 
             // Authorization header to outgoing requests.
             services
-                .AddHttpClient("Test", options => {
-                    options.BaseAddress = new Uri("https://some-remote-site.com");
-                })
+                .AddHttpClient("Test")
                 .AddHttpMessageHandler(() => new Jaahas.Http.HttpRequestTransformHandler(AddBearerTokenToRequest));
         }
 
         
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env) {
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
             if (env.IsDevelopment()) {
                 app.UseDeveloperExceptionPage();
             }
