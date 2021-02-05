@@ -25,26 +25,10 @@ namespace Jaahas.Http {
     ///   can construct the <see cref="HttpResponseMessage"/> result yourself, for use in unit 
     ///   tests etc.
     /// </remarks>
-    public delegate Task<HttpResponseMessage> HttpRequestMiddlewareDelegate(
+    public delegate Task<HttpResponseMessage> HttpRequestPipelineDelegate(
         HttpRequestMessage request,
-        HttpHandlerDelegate next, 
+        HttpMessageHandlerDelegate next, 
         CancellationToken cancellationToken
     );
-
-
-    /// <summary>
-    /// A delegate that sends an <see cref="HttpRequestMessage"/> and returns the resulting 
-    /// <see cref="HttpResponseMessage"/>.
-    /// </summary>
-    /// <param name="requestMessage">
-    ///   The HTTP requst message.
-    /// </param>
-    /// <param name="cancellationToken">
-    ///   The cancellation token for the operation.
-    /// </param>
-    /// <returns>
-    ///   A <see cref="Task{TResult}"/> that will return the HTTP response message.
-    /// </returns>
-    public delegate Task<HttpResponseMessage> HttpHandlerDelegate(HttpRequestMessage requestMessage, CancellationToken cancellationToken);
 
 }
