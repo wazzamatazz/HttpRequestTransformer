@@ -16,6 +16,6 @@ namespace Jaahas.Http {
     /// <returns>
     ///   A task that will inspect or update the <paramref name="request"/> as required.
     /// </returns>
-    public delegate Task HttpRequestTransformDelegate(HttpRequestMessage request, CancellationToken cancellationToken);
+    public delegate Task BeforeSendDelegate(HttpRequestMessage request, CancellationToken cancellationToken);
 
 }

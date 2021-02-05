@@ -20,7 +20,7 @@ namespace AddAccessTokenExample {
             // Authorization header to outgoing requests.
             services
                 .AddHttpClient("Test")
-                .AddHttpMessageHandler(() => new Jaahas.Http.HttpRequestTransformHandler(AddBearerTokenToRequest));
+                .AddHttpMessageHandler(() => new Jaahas.Http.HttpRequestPipelineHandler(AddBearerTokenToRequest));
         }
 
         

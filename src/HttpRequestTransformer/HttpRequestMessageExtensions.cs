@@ -9,7 +9,7 @@
         /// The key to use for the request state object in the <see cref="HttpRequestMessage.Properties"/>
         /// dictionary.
         /// </summary>
-        public static readonly string StatePropertyName = typeof(Jaahas.Http.HttpRequestTransformHandler).FullName + ".State";
+        public static readonly string StatePropertyName = typeof(Jaahas.Http.HttpRequestPipelineHandler).FullName + ".State";
 
 
         /// <summary>
