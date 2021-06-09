@@ -4,7 +4,7 @@ Contains `DelegatingHandler` implementations:
 
 - [HttpRequestPipelineHandler](./src/HttpRequestTransformer/HttpRequestPipelineHandler.cs) - used to inspect or modify outgoing HTTP requests prior to sending, and/or to inspect or modify received HTTP response messages. An example use case includes a backchannel HTTP client in a server-side app where you need to attach the authorization token for the calling user to an outgoing request.
 - [GZipCompressor](./src/HttpRequestTransformer/GZipCompressor.cs) - compresses the content of _outgoing_ HTTP requests using GZip compression.
-- [BrotliCompressor](./src/HttpRequestTransformer/GZipCompressor.cs) - compresses the content of _outgoing_ HTTP requests using Brotli compression (.NET Standard 2.1 and later).
+- [BrotliCompressor](./src/HttpRequestTransformer/BrotliCompressor.cs) - compresses the content of _outgoing_ HTTP requests using Brotli compression (.NET Standard 2.1 and later).
 
 
 # Getting Started
