@@ -1,6 +1,10 @@
 # HttpRequestTransformer
 
-Contains a `DelegatingHandler` implementation ([HttpRequestPipelineHandler](./src/HttpRequestTransformer/HttpRequestPipelineHandler.cs)) that can be used to inspect or modify outgoing HTTP requests prior to sending, and/or to inspect or modify received HTTP response messages. An example use case includes a backchannel HTTP client in a server-side app where you need to attach the authorization token for the calling user to an outgoing request.
+Contains `DelegatingHandler` implementations: 
+
+- [HttpRequestPipelineHandler](./src/HttpRequestTransformer/HttpRequestPipelineHandler.cs) - used to inspect or modify outgoing HTTP requests prior to sending, and/or to inspect or modify received HTTP response messages. An example use case includes a backchannel HTTP client in a server-side app where you need to attach the authorization token for the calling user to an outgoing request.
+- [GZipCompressor](./src/HttpRequestTransformer/GZipCompressor.cs) - compresses the content of _outgoing_ HTTP requests using GZip compression.
+- [BrotliCompressor](./src/HttpRequestTransformer/GZipCompressor.cs) - compresses the content of _outgoing_ HTTP requests using Brotli compression (.NET Standard 2.1 and later).
 
 
 # Getting Started
@@ -170,5 +174,33 @@ private static async Task LogResponseDetailsWithTiming(
             Console.WriteLine($"{item.Key}: {string.Join(", ", item.Value)}");
         }
     }
+}
+```
+
+
+# Example: Add GZip Compression to Outgoing HTTP Content
+
+The following example shows how to add GZip compression to all outgoing HTTP requests sent by an `HttpClient`:
+
+```csharp
+public void ConfigureServices(IServiceCollection services) {
+    services
+        .AddHttpClient("Test", options => {
+            options.BaseAddress = new Uri("https://some-remote-site.com");
+        })
+        .AddHttpMessageHandler(() => new Jaahas.Http.GZipCompressor());
+}
+```
+
+It is also possible to specify a callback that decides on a case-by-case basis if an outgoing 
+request should be compressed:
+
+```csharp
+public void ConfigureServices(IServiceCollection services) {
+    services
+        .AddHttpClient("Test", options => {
+            options.BaseAddress = new Uri("https://some-remote-site.com");
+        })
+        .AddHttpMessageHandler(() => new Jaahas.Http.GZipCompressor(req => req.RequestUri.LocalPath.Contains("/api/upload")));
 }
 ```
