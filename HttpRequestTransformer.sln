@@ -9,7 +9,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{00B8D0CB-7E2
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{B0098724-A5EB-44E8-97DB-62FC9E10B9F6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AddAccessTokenExample", "examples\AddAccessTokenExample\AddAccessTokenExample.csproj", "{44FDCA5E-1A96-42EC-BB60-BD9121558817}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AddAccessTokenExample", "examples\AddAccessTokenExample\AddAccessTokenExample.csproj", "{44FDCA5E-1A96-42EC-BB60-BD9121558817}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{C843EFD2-CB07-4488-A515-2EBBA264CE7B}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
+		Directory.Build.targets = Directory.Build.targets
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

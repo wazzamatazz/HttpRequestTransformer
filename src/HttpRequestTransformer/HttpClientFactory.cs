@@ -9,6 +9,11 @@ namespace Jaahas.Http {
     /// Provides factory methods to simplify creation of <see cref="HttpClient"/> objects in 
     /// applications that do not use dependency injection to create clients.
     /// </summary>
+    /// <remarks>
+    ///   If your application uses a dependency injection service provider, it is recommended that 
+    ///   you use the service provider to create and manage the lifecycle of <see cref="HttpClient"/> 
+    ///   instances instead of the static methods on this class.
+    /// </remarks>
     public static class HttpClientFactory {
 
         /// <summary>
@@ -25,16 +30,16 @@ namespace Jaahas.Http {
         ///   when disposed.
         /// </returns>
         /// <remarks>
-        ///   The create multiple clients that reuse the same pipeline, use the <see cref="BuildPipeline(HttpMessageHandler, DelegatingHandler[])"/> 
-        ///   or <see cref="BuildPipeline(HttpMessageHandler, IEnumerable{DelegatingHandler}?)"/> 
+        ///   The create multiple clients that reuse the same pipeline, use the <see cref="CreatePipeline(HttpMessageHandler, DelegatingHandler[])"/> 
+        ///   or <see cref="CreatePipeline(HttpMessageHandler, IEnumerable{DelegatingHandler}?)"/> 
         ///   method and create <see cref="HttpClient"/> instances manually via the <see cref="HttpClient(HttpMessageHandler, bool)"/> 
         ///   constructor.
         /// </remarks>
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="primaryHandler"/> is <see langword="null"/>.
         /// </exception>
-        public static HttpClient Build(HttpMessageHandler primaryHandler, params DelegatingHandler[] additionalHandlers) {
-            return new HttpClient(BuildPipeline(primaryHandler, additionalHandlers), true);
+        public static HttpClient Create(HttpMessageHandler primaryHandler, params DelegatingHandler[] additionalHandlers) {
+            return new HttpClient(CreatePipeline(primaryHandler, additionalHandlers), true);
         }
 
 
@@ -52,16 +57,16 @@ namespace Jaahas.Http {
         ///   when disposed.
         /// </returns>
         /// <remarks>
-        ///   The create multiple clients that reuse the same pipeline, use the <see cref="BuildPipeline(HttpMessageHandler, DelegatingHandler[])"/> 
-        ///   or <see cref="BuildPipeline(HttpMessageHandler, IEnumerable{DelegatingHandler}?)"/> 
+        ///   The create multiple clients that reuse the same pipeline, use the <see cref="CreatePipeline(HttpMessageHandler, DelegatingHandler[])"/> 
+        ///   or <see cref="CreatePipeline(HttpMessageHandler, IEnumerable{DelegatingHandler}?)"/> 
         ///   method and create <see cref="HttpClient"/> instances manually via the <see cref="HttpClient(HttpMessageHandler, bool)"/> 
         ///   constructor.
         /// </remarks>
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="primaryHandler"/> is <see langword="null"/>.
         /// </exception>
-        public static HttpClient Build(HttpMessageHandler primaryHandler, IEnumerable<DelegatingHandler>? additionalHandlers) {
-            return new HttpClient(BuildPipeline(primaryHandler, additionalHandlers), true);
+        public static HttpClient Create(HttpMessageHandler primaryHandler, IEnumerable<DelegatingHandler>? additionalHandlers) {
+            return new HttpClient(CreatePipeline(primaryHandler, additionalHandlers), true);
         }
 
 
@@ -80,8 +85,8 @@ namespace Jaahas.Http {
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="primaryHandler"/> is <see langword="null"/>.
         /// </exception>
-        public static HttpMessageHandler BuildPipeline(HttpMessageHandler primaryHandler, params DelegatingHandler[] additionalHandlers) {
-            return BuildPipeline(primaryHandler, (IEnumerable<DelegatingHandler>) additionalHandlers);
+        public static HttpMessageHandler CreatePipeline(HttpMessageHandler primaryHandler, params DelegatingHandler[] additionalHandlers) {
+            return CreatePipeline(primaryHandler, (IEnumerable<DelegatingHandler>) additionalHandlers);
         }
 
 
@@ -100,7 +105,7 @@ namespace Jaahas.Http {
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="primaryHandler"/> is <see langword="null"/>.
         /// </exception>
-        public static HttpMessageHandler BuildPipeline(HttpMessageHandler primaryHandler, IEnumerable<DelegatingHandler>? additionalHandlers) {
+        public static HttpMessageHandler CreatePipeline(HttpMessageHandler primaryHandler, IEnumerable<DelegatingHandler>? additionalHandlers) {
             if (primaryHandler == null) {
                 throw new ArgumentNullException(nameof(primaryHandler));
             }
