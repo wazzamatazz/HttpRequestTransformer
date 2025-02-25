@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,6 +17,7 @@ namespace Jaahas.Http {
     /// <returns>
     ///   A task that will inspect or update the <paramref name="request"/> as required.
     /// </returns>
+    [Obsolete("Use HttpRequestPipelineDelegate instead.")]
     public delegate Task BeforeSendDelegate(HttpRequestMessage request, CancellationToken cancellationToken);
 
 }

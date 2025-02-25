@@ -14,6 +14,7 @@ namespace Jaahas.Http {
     ///   you use the service provider to create and manage the lifecycle of <see cref="HttpClient"/> 
     ///   instances instead of the static methods on this class.
     /// </remarks>
+    [Obsolete("This type will be removed in a future version. Use Microsoft.Extensions.Http instead.")]
     public static class HttpClientFactory {
 
         /// <summary>
