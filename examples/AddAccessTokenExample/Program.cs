@@ -1,21 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 
-namespace AddAccessTokenExample {
-    public class Program {
-        public static void Main(string[] args) {
-            CreateWebHostBuilder(args).Build().Run();
-        }
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
-    }
-}
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddHttpClient("Test")
+    .AddHttpMessageHandler(() => new Jaahas.Http.HttpRequestPipelineHandler((request, next, ct) => {
+        request.Headers.Add("X-Test-Header", Guid.NewGuid().ToString());
+        return next.Invoke(request, ct);
+    }));
+
+var app = builder.Build();
+
+app.Run();
