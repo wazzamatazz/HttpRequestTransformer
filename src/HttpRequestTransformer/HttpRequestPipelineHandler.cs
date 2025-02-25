@@ -13,7 +13,7 @@ namespace Jaahas.Http {
     ///   Use this class to create <see cref="DelegatingHandler"/> instances for an HTTP request 
     ///   pipeline without having to extend <see cref="DelegatingHandler"/> yourself.
     /// </remarks>
-    public class HttpRequestPipelineHandler : DelegatingHandler {
+    public sealed class HttpRequestPipelineHandler : DelegatingHandler {
 
         /// <summary>
         /// The middleware delegate.
@@ -46,6 +46,7 @@ namespace Jaahas.Http {
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="beforeSend"/> is <see langword="null"/>.
         /// </exception>
+        [Obsolete("Use the constructor that accepts a HttpRequestPipelineDelegate instead. This constructor will be removed in a future version.")]
         public HttpRequestPipelineHandler(BeforeSendDelegate beforeSend) : this(async (req, next, ct) => {
             await beforeSend.Invoke(req, ct).ConfigureAwait(false);
             return await next(req, ct).ConfigureAwait(false);
@@ -66,6 +67,7 @@ namespace Jaahas.Http {
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="responseReceived"/> is <see langword="null"/>.
         /// </exception>
+        [Obsolete("Use the constructor that accepts a HttpRequestPipelineDelegate instead. This constructor will be removed in a future version.")]
         public HttpRequestPipelineHandler(ResponseReceivedDelegate responseReceived) : this(async (req, next, ct) => {
             var response = await next(req, ct).ConfigureAwait(false);
             await responseReceived.Invoke(response, ct).ConfigureAwait(false);
@@ -94,6 +96,7 @@ namespace Jaahas.Http {
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="responseReceived"/> is <see langword="null"/>.
         /// </exception>
+        [Obsolete("Use the constructor that accepts a HttpRequestPipelineDelegate instead. This constructor will be removed in a future version.")]
         public HttpRequestPipelineHandler(
             BeforeSendDelegate beforeSend,
             ResponseReceivedDelegate responseReceived
