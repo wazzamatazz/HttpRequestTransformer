@@ -8,7 +8,7 @@ namespace Jaahas.Http {
     /// <summary>
     /// <see cref="CompressedHttpContent"/> implementation that uses <see cref="GZipStream"/>.
     /// </summary>
-    public class GZipHttpContent : CompressedHttpContent {
+    public sealed class GZipHttpContent : CompressedHttpContent {
 
         /// <inheritdoc/>
         public override string ContentEncoding => "gzip";

@@ -10,7 +10,7 @@ namespace Jaahas.Http {
     /// <summary>
     /// <see cref="CompressedHttpContent"/> implementation that uses <see cref="BrotliStream"/>.
     /// </summary>
-    public class BrotliHttpContent : CompressedHttpContent {
+    public sealed class BrotliHttpContent : CompressedHttpContent {
 
         /// <inheritdoc/>
         public override string ContentEncoding => "br";

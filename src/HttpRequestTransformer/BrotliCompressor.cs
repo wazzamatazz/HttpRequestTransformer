@@ -11,7 +11,7 @@ namespace Jaahas.Http {
     /// <see cref="DelegatingHandler"/> that adds Brotli compression to outgoing HTTP request 
     /// content.
     /// </summary>
-    public class BrotliCompressor : DelegatingHandler {
+    public sealed class BrotliCompressor : DelegatingHandler {
 
         /// <summary>
         /// A callback that will decide if the content of a given <see cref="HttpRequestMessage"/> 
