@@ -5,13 +5,12 @@
     <AssemblyName>Jaahas.HttpRequestTransformer</AssemblyName>
     <RootNamespace>Jaahas.Http</RootNamespace>
     <PackageId>Jaahas.HttpRequestTransformer</PackageId>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <LangVersion>8.0</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <Reference Include="System.Net.Http" />
+  <ItemGroup>
+    <PackageReference Include="System.Net.Http" />
   </ItemGroup>
 
 </Project>
