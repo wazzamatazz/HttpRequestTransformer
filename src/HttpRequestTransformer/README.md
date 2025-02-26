@@ -1,0 +1,76 @@
+# About
+
+Jaahas.HttpRequestTransformer defines delegating handlers for transforming HTTP requests and responses.
+
+
+# Transforming Requests and Responses via Delegates
+
+The `HttpRequestPipelineHandler` delegating handler can be used to transform requests and responses via a delegate:
+
+```csharp
+builder.Services.AddHttpClient("PipelineTransformer")
+    .AddHttpMessageHandler(() => new HttpRequestPipelineHandler(async (request, next, cancellationToken) => {
+        request.Headers.Add("X-CustomRequestHeader", Guid.NewGuid().ToString());
+        var response = await next.Invoke(request, cancellationToken);
+        response.Headers.Add("X-CustomResponseHeader", Guid.NewGuid().ToString());
+        return response;
+    }));
+```
+
+
+# Compressing Outgoing Requests
+
+Jaahas.HttpRequestTransformer provides delegating handlers that can compress outgoing requests (for example if you are sending a large file or other payload to a server that supports compressed request bodies).
+
+## GZip
+
+The `GZipCompressor` delegating handler can be used to compress outgoing requests using GZip compression:
+
+```csharp
+builder.Services.AddHttpClient("GZipCompressor")
+    .AddHttpMessageHandler(() => new GZipCompressor());
+```
+
+The constructor also accepts an optional callback that can be used to determine whether a request should be compressed or not:
+
+```csharp
+builder.Services.AddHttpClient("GZipCompressor")
+    // Compress all POST requests
+    .AddHttpMessageHandler(() => new GZipCompressor(callback: request => request.Method == HttpMethod.Post));
+```
+
+
+## Brotli
+
+> Brotli compression is not available when targeting .NET Framework.
+
+The `BrotliCompressor` delegating handler can be used to compress outgoing requests using [Brotli](https://developer.mozilla.org/en-US/docs/Glossary/Brotli_compression) compression:
+
+```csharp
+builder.Services.AddHttpClient("BrotliCompressor")
+    .AddHttpMessageHandler(() => new BrotliCompressor());
+```
+
+The constructor also accepts an optional callback that can be used to determine whether a request should be compressed or not:
+
+```csharp
+builder.Services.AddHttpClient("BrotliCompressor")
+    // Compress all POST requests
+    .AddHttpMessageHandler(() => new BrotliCompressor(callback: request => request.Method == HttpMethod.Post));
+```
+
+
+# Creating Custom HTTP Request Pipelines
+
+> In most cases, you should use Microsoft.Extensions.Http to configure and create HTTP clients, especially for long-running applications that need to manage the lifecycle of HTTP message handlers. The `HttpClientFactory` class in this library is designed for simple use cases where dependency injection is not available.
+
+The `HttpClientFactory` class can be used to simplify creation of HTTP clients and HTTP pipelines where one or more delegating handlers are required:
+
+```csharp
+var httpClient = HttpClientFactory.Create(
+    new HttpRequestPipelineHandler((request, next, cancellationToken) => {
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", GetToken());
+        return next.Invoke(request, cancellationToken);
+    }),
+    new GZipCompressor());
+```
