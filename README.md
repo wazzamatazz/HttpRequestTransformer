@@ -1,208 +1,89 @@
-# HttpRequestTransformer
+# About
 
-Contains the following `DelegatingHandler` implementations: 
-
-- [HttpRequestPipelineHandler](./src/HttpRequestTransformer/HttpRequestPipelineHandler.cs) - used to inspect or modify outgoing HTTP requests prior to sending, and/or to inspect or modify received HTTP response messages. An example use case includes a backchannel HTTP client in a server-side app where you need to attach the authorization token for the calling user to an outgoing request.
-- [GZipCompressor](./src/HttpRequestTransformer/GZipCompressor.cs) - compresses the content of _outgoing_ HTTP requests using GZip compression.
-- [BrotliCompressor](./src/HttpRequestTransformer/BrotliCompressor.cs) - compresses the content of _outgoing_ HTTP requests using Brotli compression (.NET Standard 2.1 and later).
-
-In addition, the [HttpClientFactory](./src/HttpRequestTransformer/HttpClientFactory.cs) class can be used to simplify creation of `HttpClient` instances in applications that do not use dependency injection.
+Jaahas.HttpRequestTransformer defines delegating handlers for transforming HTTP requests and responses.
 
 
-# Getting Started
+# Transforming Requests and Responses via Delegates
 
-Add the `Jaahas.HttpRequestTransformer` [NuGet package](https://www.nuget.org/packages/Jaahas.HttpRequestTransformer) to your project.
-
-
-# Example: Adding a Header to Outgoing Requests
-
-In this example, we'll attach a bearer token to outgoing requests made by a backchannel client in an ASP.NET Core application. First, add an [HttpRequestPipelineHandler](./src/HttpRequestTransformer/HttpRequestPipelineHandler.cs) to the request pipeline for your `HttpClient`:
+The `HttpRequestPipelineHandler` delegating handler can be used to transform requests and responses via a delegate:
 
 ```csharp
-public void ConfigureServices(IServiceCollection services) {
-    services
-        .AddHttpClient("Test", options => {
-            options.BaseAddress = new Uri("https://some-remote-site.com");
-        })
-        .AddHttpMessageHandler(() => new Jaahas.Http.HttpRequestPipelineHandler(AddBearerTokenToRequest));
-}
-```
-
-Next, implement the function that will retrieve the access token for a given `ClaimsPrincipal`:
-
-```csharp
-private static Task AddBearerTokenToRequest(HttpRequestMessage request, CancellationToken cancellationToken) {
-    var principal = request.GetStateProperty<ClaimsPrincipal>();
-    if (principal?.Identity?.IsAuthenticated ?? false) {
-        string token;
-
-        // Plug in your own logic here to get the actual token for the principal...
-
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-    }
-    return Task.CompletedTask;
-}
-```
-
-Finally, in your code that will use the client, add a `ClaimsPrincipal` to the outgoing request's properties prior to sending:
-
-```csharp
-[ApiController]
-[Authorize]
-public class MyController : ControllerBase {
-
-    private readonly HttpClient _httpClient;
-
-
-    public MyController(IHttpClientFactory factory) {
-        _httpClient = factory.CreateClient("Test");
-    }
-
-
-    public async Task<IActionResult> GetDataFromRemoteSite(CancellationToken cancellationToken) {
-        var request = new HttpRequestMessage(HttpMethod.Get, "/api/data").AddStateProperty(User);
-        var response = await _httpClient.SendAsync(request, cancellationToken);
-
-        // Process the response and return the result to the caller.
-    } 
-
-}
+builder.Services.AddHttpClient("PipelineTransformer")
+    .AddHttpMessageHandler(() => new HttpRequestPipelineHandler(async (request, next, cancellationToken) => {
+        request.Headers.Add("X-CustomRequestHeader", Guid.NewGuid().ToString());
+        var response = await next.Invoke(request, cancellationToken);
+        response.Headers.Add("X-CustomResponseHeader", Guid.NewGuid().ToString());
+        return response;
+    }));
 ```
 
 
-# Example: Logging Detailed Response Information
+# Compressing Outgoing Requests
 
-In this example, we'll create an HTTP handler that will write detailed information about an HTTP request and response to the console:
+Jaahas.HttpRequestTransformer provides delegating handlers that can compress outgoing requests (for example if you are sending a large file or other payload to a server that supports compressed request bodies).
+
+## GZip
+
+The `GZipCompressor` delegating handler can be used to compress outgoing requests using GZip compression:
 
 ```csharp
-public void ConfigureServices(IServiceCollection services) {
-    services
-        .AddHttpClient("Test", options => {
-            options.BaseAddress = new Uri("https://some-remote-site.com");
-        })
-        .AddHttpMessageHandler(() => new Jaahas.Http.HttpRequestPipelineHandler(LogResponseDetails));
-}
+builder.Services.AddHttpClient("GZipCompressor")
+    .AddHttpMessageHandler(() => new GZipCompressor());
+```
 
+The constructor also accepts an optional callback that can be used to determine whether a request should be compressed or not:
 
-private static Task LogResponseDetails(HttpResponseMessage response, CancellationToken cancellationToken) {
-    // Method and endpoint.
-    Console.WriteLine($"{response.RequestMessage.Method} {response.RequestMessage.RequestUri}");
-    Console.WriteLine();
-
-    // Request headers.
-    foreach (var item in response.RequestMessage.Headers) {
-        Console.WriteLine($"{item.Key}: {string.Join(", ", item.Value)}");
-    }
-    if (response.RequestMessage.Content != null) {
-        foreach (var item in response.RequestMessage.Content.Headers) {
-            Console.WriteLine($"{item.Key}: {string.Join(", ", item.Value)}");
-        }
-    }
-    Console.WriteLine();
-
-    // Response summary.
-    Console.WriteLine($"HTTP/{response.Version.Major}.{response.Version.Minor} {(int) response.StatusCode} {response.ReasonPhrase}");
-    Console.WriteLine();
-
-    // Response headers.
-    foreach (var item in response.Headers) {
-        Console.WriteLine($"{item.Key}: {string.Join(", ", item.Value)}");
-    }
-    if (response.Content != null) {
-        foreach (var item in response.Content.Headers) {
-            Console.WriteLine($"{item.Key}: {string.Join(", ", item.Value)}");
-        }
-    }
-
-    return Task.CompletedTask;
-}
+```csharp
+builder.Services.AddHttpClient("GZipCompressor")
+    // Compress requests to specific routes
+    .AddHttpMessageHandler(() => new GZipCompressor(callback: request => request.RequestUri.LocalPath.Contains("/api/upload"))));
 ```
 
 
-# Example: Logging Detailed Response Information with Timing Information
+## Brotli
 
-In this example, we extend the previous example to include information about how long an HTTP request took. Rather than specifying a delegate to invoke before sending a request or after receiving a response, we specify a delegate that can invoke the inner handlers in the request pipeline, and then perform additional work once the response has been received:
+> Brotli compression is not available when targeting .NET Framework.
+
+The `BrotliCompressor` delegating handler can be used to compress outgoing requests using [Brotli](https://developer.mozilla.org/en-US/docs/Glossary/Brotli_compression) compression:
 
 ```csharp
-public void ConfigureServices(IServiceCollection services) {
-    services
-        .AddHttpClient("Test", options => {
-            options.BaseAddress = new Uri("https://some-remote-site.com");
-        })
-        .AddHttpMessageHandler(() => new Jaahas.Http.HttpRequestPipelineHandler(LogResponseDetailsWithTiming));
-}
+builder.Services.AddHttpClient("BrotliCompressor")
+    .AddHttpMessageHandler(() => new BrotliCompressor());
+```
 
+The constructor also accepts an optional callback that can be used to determine whether a request should be compressed or not:
 
-private static async Task LogResponseDetailsWithTiming(
-    HttpRequestMessage request, 
-    HttpMessageHandlerDelegate next, 
-    CancellationToken cancellationToken
-) {
-    // Start the stopwatch.
-    var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-
-    // Invoke the inner handlers.
-    var response = await next(request, cancellationToken).ConfigureAwait(false);
-
-    // Measure the elapsed time.
-    var elapsed = stopwatch.ElapsedMilliseconds;
-
-    // Method and endpoint.
-    Console.WriteLine($"{response.RequestMessage.Method} {response.RequestMessage.RequestUri}");
-    Console.WriteLine();
-
-    // Request headers.
-    foreach (var item in response.RequestMessage.Headers) {
-        Console.WriteLine($"{item.Key}: {string.Join(", ", item.Value)}");
-    }
-    if (response.RequestMessage.Content != null) {
-        foreach (var item in response.RequestMessage.Content.Headers) {
-            Console.WriteLine($"{item.Key}: {string.Join(", ", item.Value)}");
-        }
-    }
-    Console.WriteLine();
-
-    // Response summary and elapsed time.
-    Console.WriteLine($"HTTP/{response.Version.Major}.{response.Version.Minor} {(int) response.StatusCode} {response.ReasonPhrase}");
-    Console.WriteLine($"{elapsed} ms");
-    Console.WriteLine();
-
-    // Response headers.
-    foreach (var item in response.Headers) {
-        Console.WriteLine($"{item.Key}: {string.Join(", ", item.Value)}");
-    }
-    if (response.Content != null) {
-        foreach (var item in response.Content.Headers) {
-            Console.WriteLine($"{item.Key}: {string.Join(", ", item.Value)}");
-        }
-    }
-}
+```csharp
+builder.Services.AddHttpClient("BrotliCompressor")
+    // Compress requests to specific routes
+    .AddHttpMessageHandler(() => new BrotliCompressor(callback: request => request.RequestUri.LocalPath.Contains("/api/upload")));
 ```
 
 
-# Example: Add GZip Compression to Outgoing HTTP Content
+# Creating Custom HTTP Request Pipelines
 
-The following example shows how to add GZip compression to all outgoing HTTP requests sent by an `HttpClient`:
+> In most cases, you should use Microsoft.Extensions.Http to configure and create HTTP clients, especially for long-running applications that need to manage the lifecycle of HTTP message handlers. The `HttpClientFactory` class in this library is designed for simple use cases where dependency injection is not available.
 
-```csharp
-public void ConfigureServices(IServiceCollection services) {
-    services
-        .AddHttpClient("Test", options => {
-            options.BaseAddress = new Uri("https://some-remote-site.com");
-        })
-        .AddHttpMessageHandler(() => new Jaahas.Http.GZipCompressor());
-}
-```
-
-It is also possible to specify a callback that decides on a case-by-case basis if an outgoing 
-request should be compressed:
+The `HttpClientFactory` class can be used to simplify creation of HTTP clients and HTTP pipelines where one or more delegating handlers are required:
 
 ```csharp
-public void ConfigureServices(IServiceCollection services) {
-    services
-        .AddHttpClient("Test", options => {
-            options.BaseAddress = new Uri("https://some-remote-site.com");
-        })
-        .AddHttpMessageHandler(() => new Jaahas.Http.GZipCompressor(req => req.RequestUri.LocalPath.Contains("/api/upload")));
-}
+var httpClient = HttpClientFactory.Create(
+    new HttpRequestPipelineHandler((request, next, cancellationToken) => {
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", GetToken());
+        return next.Invoke(request, cancellationToken);
+    }),
+    new GZipCompressor());
 ```
+
+# Building the Solution
+
+The repository uses [Cake](https://cakebuild.net/) for cross-platform build automation. The build script allows for metadata such as a build counter to be specified when called by a continuous integration system such as TeamCity.
+
+A build can be run from the command line using the [build.ps1](/build.ps1) PowerShell script or the [build.sh](/build.sh) Bash script. For documentation about the available build script parameters, see [build.cake](/build.cake).
+
+
+# Software Bill of Materials
+
+To generate a Software Bill of Materials (SBOM) for the repository in [CycloneDX](https://cyclonedx.org/) XML format, run [build.ps1](./build.ps1) or [build.sh](./build.sh) with the `--target BillOfMaterials` parameter.
+
+The resulting SBOM is written to the `artifacts/bom` folder.
