@@ -10,12 +10,26 @@ namespace Jaahas.Http {
     /// applications that do not use dependency injection to create clients.
     /// </summary>
     /// <remarks>
-    ///   If your application uses a dependency injection service provider, it is recommended that 
-    ///   you use the service provider to create and manage the lifecycle of <see cref="HttpClient"/> 
-    ///   instances instead of the static methods on this class.
+    ///   It is recommended that you only use this class in situations where it is not practical or
+    ///   desired to use Microsoft.Extensions.Http to manage <see cref="HttpClient"/> creation.
     /// </remarks>
     public static class HttpClientFactory {
 
+        /// <summary>
+        /// Creates a new <see cref="HttpClient"/> using the specified message handlers.
+        /// </summary>
+        /// <param name="additionalHandlers">
+        ///   The additional handlers to add to the request pipeline for the client.
+        /// </param>
+        /// <returns>
+        ///   A new <see cref="HttpClient"/> that will dispose the underlying message handler
+        ///   pipeline when disposed.
+        /// </returns>
+        public static HttpClient Create(params DelegatingHandler[] additionalHandlers) {
+            return new HttpClient(CreatePipeline(additionalHandlers), true);
+        }
+        
+        
         /// <summary>
         /// Creates a new <see cref="HttpClient"/> using the specified message handlers.
         /// </summary>
@@ -26,15 +40,9 @@ namespace Jaahas.Http {
         ///   The additional handlers to add to the request pipeline for the client.
         /// </param>
         /// <returns>
-        ///   A new <see cref="HttpClient"/> that will dispose of the <paramref name="primaryHandler"/> 
-        ///   when disposed.
+        ///   A new <see cref="HttpClient"/> that will dispose the underlying message handler
+        ///   pipeline when disposed.
         /// </returns>
-        /// <remarks>
-        ///   The create multiple clients that reuse the same pipeline, use the <see cref="CreatePipeline(HttpMessageHandler, DelegatingHandler[])"/> 
-        ///   or <see cref="CreatePipeline(HttpMessageHandler, IEnumerable{DelegatingHandler}?)"/> 
-        ///   method and create <see cref="HttpClient"/> instances manually via the <see cref="HttpClient(HttpMessageHandler, bool)"/> 
-        ///   constructor.
-        /// </remarks>
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="primaryHandler"/> is <see langword="null"/>.
         /// </exception>
@@ -53,20 +61,28 @@ namespace Jaahas.Http {
         ///   The additional handlers to add to the request pipeline for the client.
         /// </param>
         /// <returns>
-        ///   A new <see cref="HttpClient"/> that will dispose of the <paramref name="primaryHandler"/> 
-        ///   when disposed.
+        ///   A new <see cref="HttpClient"/> that will dispose the underlying message handler
+        ///   pipeline when disposed.
         /// </returns>
-        /// <remarks>
-        ///   The create multiple clients that reuse the same pipeline, use the <see cref="CreatePipeline(HttpMessageHandler, DelegatingHandler[])"/> 
-        ///   or <see cref="CreatePipeline(HttpMessageHandler, IEnumerable{DelegatingHandler}?)"/> 
-        ///   method and create <see cref="HttpClient"/> instances manually via the <see cref="HttpClient(HttpMessageHandler, bool)"/> 
-        ///   constructor.
-        /// </remarks>
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="primaryHandler"/> is <see langword="null"/>.
         /// </exception>
         public static HttpClient Create(HttpMessageHandler primaryHandler, IEnumerable<DelegatingHandler>? additionalHandlers) {
             return new HttpClient(CreatePipeline(primaryHandler, additionalHandlers), true);
+        }
+        
+        
+        /// <summary>
+        /// Creates a new <see cref="HttpClient"/> pipeline using the specified message handlers.
+        /// </summary>
+        /// <param name="additionalHandlers">
+        ///   The additional handlers to add to the request pipeline.
+        /// </param>
+        /// <returns>
+        ///   The outer <see cref="HttpMessageHandler"/> for the pipeline.
+        /// </returns>
+        public static HttpMessageHandler CreatePipeline(params DelegatingHandler[] additionalHandlers) {
+            return CreatePipeline(new HttpClientHandler(), (IEnumerable<DelegatingHandler>) additionalHandlers);
         }
 
 
@@ -110,7 +126,7 @@ namespace Jaahas.Http {
                 throw new ArgumentNullException(nameof(primaryHandler));
             }
 
-            if (additionalHandlers == null || !additionalHandlers.Any()) {
+            if (additionalHandlers == null) {
                 return primaryHandler;
             }
 

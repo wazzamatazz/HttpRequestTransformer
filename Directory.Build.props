@@ -1,38 +1,25 @@
-<Project>
-
-  <!-- Recursively import the Directory.Build.targets file from the parent folder if it exists. -->
+﻿<Project>
+  
+  <!-- Recursively import the Directory.Build.props file from the parent folder if it exists. -->
   <PropertyGroup>
     <ParentProject>$([MSBuild]::GetPathOfFileAbove('$(MSBuildThisFile)', '$(MSBuildThisFileDirectory)../'))</ParentProject>
   </PropertyGroup>
   <Import Project="$(ParentProject)" Condition=" '$(ParentProject)' != '' " /> 
 
   <PropertyGroup>
-    <Authors>Graham Watts</Authors>
-    <Description>Delegating handler that can be used to inspect or transform HttpRequestMessage and HttpResponseMessage instances in an HttpClient pipeline.</Description>
-    <CopyrightStartYear>2019</CopyrightStartYear>
-    <PackageProjectUrl>https://github.com/wazzamatazz/HttpRequestTransformer</PackageProjectUrl>
-    <PackageOutputPath>$(MSBuildThisFileDirectory)artifacts</PackageOutputPath>
-    <MajorVersion>2</MajorVersion>
-    <MinorVersion>2</MinorVersion>
-    <PatchVersion>0</PatchVersion>
-    <RevisionVersion>0</RevisionVersion>
-    <Version>$(MajorVersion).$(MinorVersion).$(PatchVersion)</Version>
-    <AssemblyVersion>$(MajorVersion).$(MinorVersion).0.0</AssemblyVersion>
-    <AssemblyFileVersion>$(MajorVersion).$(MinorVersion).$(PatchVersion).$(RevisionVersion)</AssemblyFileVersion>
+    <Authors>{{AUTHORS}}</Authors>
+    <Company>{{COMPANY_NAME}}</Company>
+    <PackageProjectUrl>https://github.com/{{GITHUB_USER_OR_ORG_NAME}}/{{REPO_NAME}}</PackageProjectUrl>
+    <PackageOutputPath>$(MSBuildThisFileDirectory)artifacts\packages\$(Configuration)</PackageOutputPath>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <NeutralLanguage>en</NeutralLanguage>
+    <CopyrightStartYear>{{COPYRIGHT_START_YEAR}}</CopyrightStartYear>
   </PropertyGroup>
 
-  <!-- Set the copyright notice based on the current year at build time. -->
-  <Choose>
-    <When Condition=" '$([System.DateTime]::Now.Year)' > '$(CopyrightStartYear)' ">
-      <PropertyGroup>
-        <Copyright>Copyright © $(CopyrightStartYear)-$([System.DateTime]::Now.Year) $(Authors)</Copyright>
-      </PropertyGroup>
-    </When>
-    <Otherwise>
-      <PropertyGroup>
-        <Copyright>Copyright © $(CopyrightStartYear) $(Authors)</Copyright>
-      </PropertyGroup>
-    </Otherwise>
-  </Choose>
+  <!-- Set copyright notice based on CopyrightStartYear property. -->
+  <Import Project=".\build\Copyright.props" Condition="Exists('.\build\Copyright.props')" />
+
+  <!-- Extension point to allow Continuous Integration systems to inject their own configuration. -->
+  <Import Project="CI.props" Condition="Exists('CI.props')" />
 
 </Project>

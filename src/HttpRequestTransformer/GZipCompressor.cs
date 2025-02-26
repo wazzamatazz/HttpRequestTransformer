@@ -9,7 +9,7 @@ namespace Jaahas.Http {
     /// <see cref="DelegatingHandler"/> that adds GZip compression to outgoing HTTP request 
     /// content.
     /// </summary>
-    public class GZipCompressor : DelegatingHandler {
+    public sealed class GZipCompressor : DelegatingHandler {
 
         /// <summary>
         /// A callback that will decide if the content of a given <see cref="HttpRequestMessage"/> 
