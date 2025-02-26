@@ -35,8 +35,8 @@ The constructor also accepts an optional callback that can be used to determine 
 
 ```csharp
 builder.Services.AddHttpClient("GZipCompressor")
-    // Compress all POST requests
-    .AddHttpMessageHandler(() => new GZipCompressor(callback: request => request.Method == HttpMethod.Post));
+    // Compress requests to specific routes
+    .AddHttpMessageHandler(() => new GZipCompressor(callback: request => request.RequestUri.LocalPath.Contains("/api/upload"))));
 ```
 
 
@@ -55,8 +55,8 @@ The constructor also accepts an optional callback that can be used to determine 
 
 ```csharp
 builder.Services.AddHttpClient("BrotliCompressor")
-    // Compress all POST requests
-    .AddHttpMessageHandler(() => new BrotliCompressor(callback: request => request.Method == HttpMethod.Post));
+    // Compress requests to specific routes
+    .AddHttpMessageHandler(() => new BrotliCompressor(callback: request => request.RequestUri.LocalPath.Contains("/api/upload")));
 ```
 
 
