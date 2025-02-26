@@ -10,11 +10,9 @@ namespace Jaahas.Http {
     /// applications that do not use dependency injection to create clients.
     /// </summary>
     /// <remarks>
-    ///   If your application uses a dependency injection service provider, it is recommended that 
-    ///   you use the service provider to create and manage the lifecycle of <see cref="HttpClient"/> 
-    ///   instances instead of the static methods on this class.
+    ///   It is recommended that you only use this class in situations where it is not practical or
+    ///   desired to use Microsoft.Extensions.Http to manage <see cref="HttpClient"/> creation.
     /// </remarks>
-    [Obsolete("This type will be removed in a future version. Use Microsoft.Extensions.Http instead.")]
     public static class HttpClientFactory {
 
         /// <summary>
@@ -111,7 +109,7 @@ namespace Jaahas.Http {
                 throw new ArgumentNullException(nameof(primaryHandler));
             }
 
-            if (additionalHandlers == null || !additionalHandlers.Any()) {
+            if (additionalHandlers == null) {
                 return primaryHandler;
             }
 
